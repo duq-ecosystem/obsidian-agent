@@ -15,12 +15,11 @@ from obsidian_agent.service import Note, ObsidianService
 @pytest.fixture
 def agent_config() -> AgentConfig:
     """Create test agent configuration."""
-    return AgentConfig(
-        name="obsidian-agent",
-        port=9001,
-        redis_url="redis://localhost:6379",
-        log_level="DEBUG",
-    )
+    config = AgentConfig()
+    config.port = 9001
+    config.redis_url = "redis://localhost:6379"
+    config.log_level = "DEBUG"
+    return config
 
 
 @pytest.fixture
