@@ -8,21 +8,16 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy duq-agent-core first (dependency)
-COPY --from=duq-agent-core /app /opt/duq-agent-core
-
-# Install duq-agent-core
-RUN pip install --no-cache-dir /opt/duq-agent-core
-
 # Copy project files
-COPY pyproject.toml .
+COPY pyproject.toml README.md ./
 COPY constitution.yaml .
 COPY src/ src/
 
-# Install obsidian-agent
-RUN pip install --no-cache-dir -e .
+# Install obsidian-agent (pulls duq-agent-core from GitHub)
+RUN pip install --no-cache-dir .
 
 # Environment variables
 ENV OBSIDIAN_AGENT_PORT=9001
