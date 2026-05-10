@@ -81,24 +81,24 @@ class TestToolDefinitions:
         for tool in tools:
             assert tool.name is not None
             assert tool.description is not None
-            assert tool.parameters is not None
+            assert tool.input_schema is not None
 
     def test_read_tool_definition(self, agent: ObsidianAgent) -> None:
         """obsidian_read tool has correct parameters."""
         tools = agent.get_tools()
         read_tool = next(t for t in tools if t.name == "obsidian_read")
 
-        assert "path" in read_tool.parameters
-        assert read_tool.parameters["path"]["required"] is True
+        assert "path" in read_tool.input_schema
+        assert read_tool.input_schema["path"]["required"] is True
 
     def test_create_tool_definition(self, agent: ObsidianAgent) -> None:
         """obsidian_create tool has correct parameters."""
         tools = agent.get_tools()
         create_tool = next(t for t in tools if t.name == "obsidian_create")
 
-        assert "path" in create_tool.parameters
-        assert "content" in create_tool.parameters
-        assert "overwrite" in create_tool.parameters
+        assert "path" in create_tool.input_schema
+        assert "content" in create_tool.input_schema
+        assert "overwrite" in create_tool.input_schema
 
 
 class TestSkillExtraction:

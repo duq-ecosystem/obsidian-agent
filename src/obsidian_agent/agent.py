@@ -159,12 +159,12 @@ class ObsidianAgent(AgentTemplate):
             ToolDefinition(
                 name="obsidian_read",
                 description="Read a note. Need EXACT name.",
-                parameters={"path": {"type": "string", "required": True}},
+                input_schema={"path": {"type": "string", "required": True}},
             ),
             ToolDefinition(
                 name="obsidian_create",
                 description="Create a new note.",
-                parameters={
+                input_schema={
                     "path": {"type": "string", "required": True},
                     "content": {"type": "string", "required": True},
                     "overwrite": {"type": "boolean", "default": False},
@@ -174,7 +174,7 @@ class ObsidianAgent(AgentTemplate):
             ToolDefinition(
                 name="obsidian_update",
                 description="Update existing note (replace content).",
-                parameters={
+                input_schema={
                     "path": {"type": "string", "required": True},
                     "content": {"type": "string", "required": True},
                 },
@@ -182,7 +182,7 @@ class ObsidianAgent(AgentTemplate):
             ToolDefinition(
                 name="obsidian_append",
                 description="Append content to existing note.",
-                parameters={
+                input_schema={
                     "path": {"type": "string", "required": True},
                     "content": {"type": "string", "required": True},
                 },
@@ -190,12 +190,12 @@ class ObsidianAgent(AgentTemplate):
             ToolDefinition(
                 name="obsidian_delete",
                 description="Delete a note. CAUTION: irreversible!",
-                parameters={"path": {"type": "string", "required": True}},
+                input_schema={"path": {"type": "string", "required": True}},
             ),
             ToolDefinition(
                 name="obsidian_search",
                 description="Search inside notes by text.",
-                parameters={
+                input_schema={
                     "query": {"type": "string", "required": True},
                     "folder": {"type": "string"},
                     "max_results": {"type": "integer", "default": 20},
@@ -204,7 +204,7 @@ class ObsidianAgent(AgentTemplate):
             ToolDefinition(
                 name="obsidian_move",
                 description="Move or rename a note.",
-                parameters={
+                input_schema={
                     "old_path": {"type": "string", "required": True},
                     "new_path": {"type": "string", "required": True},
                 },
@@ -212,22 +212,22 @@ class ObsidianAgent(AgentTemplate):
             ToolDefinition(
                 name="obsidian_folders",
                 description="Show folder structure in vault.",
-                parameters={},
+                input_schema={},
             ),
             ToolDefinition(
                 name="obsidian_list",
                 description="List all notes in vault or folder.",
-                parameters={"folder": {"type": "string"}},
+                input_schema={"folder": {"type": "string"}},
             ),
             ToolDefinition(
                 name="obsidian_tags",
                 description="Get tags from a note.",
-                parameters={"path": {"type": "string", "required": True}},
+                input_schema={"path": {"type": "string", "required": True}},
             ),
             ToolDefinition(
                 name="obsidian_search_tag",
                 description="Find notes with a specific tag.",
-                parameters={
+                input_schema={
                     "tag": {"type": "string", "required": True},
                     "folder": {"type": "string"},
                 },
@@ -235,7 +235,7 @@ class ObsidianAgent(AgentTemplate):
             ToolDefinition(
                 name="obsidian_backlinks",
                 description="Find notes that link to this note.",
-                parameters={"path": {"type": "string", "required": True}},
+                input_schema={"path": {"type": "string", "required": True}},
             ),
         ]
 
