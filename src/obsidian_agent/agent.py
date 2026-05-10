@@ -40,7 +40,7 @@ class ObsidianAgent(AgentTemplate):
         card = AgentCard(
             name="obsidian-agent",
             description="DUQ Obsidian vault specialist - manages notes, search, and navigation",
-            url=f"http://localhost:{config.port}",
+            url=config.get_public_url(),
             version="1.0.0",
             capabilities=AgentCapabilities(
                 streaming=True,
