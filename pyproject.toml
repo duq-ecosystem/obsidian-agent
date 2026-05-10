@@ -9,8 +9,8 @@ authors = [
 ]
 
 dependencies = [
-    # Agent core library
-    "duq-agent-core @ file:///home/danny/Documents/projects/duq-agent-core",
+    # Agent core library (from GitHub)
+    "duq-agent-core @ git+https://github.com/duq-ecosystem/duq-agent-core.git@master",
 
     # FastAPI for A2A server
     "fastapi>=0.110.0",
