@@ -260,6 +260,10 @@ class ObsidianAgent(AgentTemplate):
             )
             params = task.context.get("parameters", {})
 
+            # If no params provided, try to extract from message
+            if not params and skill_id:
+                params = self._extract_params_from_message(task.message, skill_id)
+
             # If no skill ID, treat message as a natural language request
             if not skill_id:
                 return A2ATaskResult(
@@ -320,18 +324,54 @@ class ObsidianAgent(AgentTemplate):
         message_lower = message.lower()
 
         skill_keywords = {
-            "obsidian_read": ["read", "get content", "show note", "open"],
-            "obsidian_create": ["create", "new note", "write new"],
-            "obsidian_update": ["update", "replace", "change content"],
-            "obsidian_append": ["append", "add to", "add content"],
-            "obsidian_delete": ["delete", "remove", "trash"],
-            "obsidian_search": ["search", "find text", "grep", "search inside"],
-            "obsidian_move": ["move", "rename"],
-            "obsidian_folders": ["folders", "folder structure", "list folders"],
-            "obsidian_list": ["list", "show notes", "what notes"],
-            "obsidian_tags": ["tags", "get tags"],
-            "obsidian_search_tag": ["find by tag", "search tag", "notes with tag"],
-            "obsidian_backlinks": ["backlinks", "links to", "what links"],
+            "obsidian_read": [
+                "read", "get content", "show note", "open",
+                "прочитай", "прочитать", "покажи", "открой", "содержимое",
+            ],
+            "obsidian_create": [
+                "create", "new note", "write new",
+                "создай", "создать", "новую заметку", "напиши",
+            ],
+            "obsidian_update": [
+                "update", "replace", "change content",
+                "обнови", "обновить", "замени", "измени",
+            ],
+            "obsidian_append": [
+                "append", "add to", "add content",
+                "добавь", "добавить", "дополни",
+            ],
+            "obsidian_delete": [
+                "delete", "remove", "trash",
+                "удали", "удалить", "убери",
+            ],
+            "obsidian_search": [
+                "search", "find text", "grep", "search inside",
+                "найди", "найти", "поиск", "поищи",
+            ],
+            "obsidian_move": [
+                "move", "rename",
+                "перемести", "переименуй",
+            ],
+            "obsidian_folders": [
+                "folders", "folder structure", "list folders",
+                "папки", "структура папок",
+            ],
+            "obsidian_list": [
+                "list", "show notes", "what notes",
+                "список", "покажи заметки", "какие заметки",
+            ],
+            "obsidian_tags": [
+                "tags", "get tags",
+                "теги", "покажи теги",
+            ],
+            "obsidian_search_tag": [
+                "find by tag", "search tag", "notes with tag",
+                "по тегу", "с тегом",
+            ],
+            "obsidian_backlinks": [
+                "backlinks", "links to", "what links",
+                "ссылки на", "обратные ссылки",
+            ],
         }
 
         for skill_id, keywords in skill_keywords.items():
@@ -339,6 +379,89 @@ class ObsidianAgent(AgentTemplate):
                 return skill_id
 
         return None
+
+    def _extract_params_from_message(
+        self, message: str | dict, skill_id: str
+    ) -> dict[str, Any]:
+        """Extract parameters from natural language message.
+
+        Simple heuristic extraction - looks for note names after keywords.
+
+        Args:
+            message: The message text
+            skill_id: The detected skill ID
+
+        Returns:
+            Dict of extracted parameters
+        """
+        import re
+
+        # Handle dict message format
+        if isinstance(message, dict):
+            parts = message.get("parts", [])
+            if parts:
+                text_parts = [
+                    p.get("text", "") for p in parts
+                    if isinstance(p, dict) and p.get("kind") == "text"
+                ]
+                message = " ".join(text_parts)
+            elif "text" in message:
+                message = str(message["text"])
+            else:
+                message = str(message)
+
+        # For read, create, update, append, delete - extract path
+        if skill_id in [
+            "obsidian_read", "obsidian_create", "obsidian_update",
+            "obsidian_append", "obsidian_delete", "obsidian_tags",
+            "obsidian_backlinks",
+        ]:
+            # Try to find note name patterns
+            # Match: "заметку X", "note X", "file X", etc.
+            patterns = [
+                r"(?:заметк[уа]|note|file|файл)\s+['\"]?([^\s'\"]+)['\"]?",
+                r"(?:заметк[уа]|note|file|файл)\s+(.+?)(?:\s+и\s+|\s+потом\s+|$)",
+            ]
+            for pattern in patterns:
+                match = re.search(pattern, message, re.IGNORECASE)
+                if match:
+                    path = match.group(1).strip()
+                    # Remove trailing punctuation
+                    path = re.sub(r'[.,!?;:]+$', '', path)
+                    return {"path": path}
+
+            # Fallback: last word that looks like a path
+            words = message.split()
+            for word in reversed(words):
+                if "/" in word or word.endswith(".md") or (
+                    len(word) > 3 and "-" in word
+                ):
+                    return {"path": word.strip(".,!?;:'\"")}
+
+        # For search - extract query
+        if skill_id == "obsidian_search":
+            # Extract text after "найди", "search", etc.
+            patterns = [
+                r"(?:найди|найти|search|find|искать)\s+(.+?)$",
+                r"(?:поиск|grep)\s+(.+?)$",
+            ]
+            for pattern in patterns:
+                match = re.search(pattern, message, re.IGNORECASE)
+                if match:
+                    return {"query": match.group(1).strip()}
+
+        # For list - extract folder
+        if skill_id == "obsidian_list":
+            patterns = [
+                r"(?:в\s+папке|in folder|folder)\s+['\"]?([^\s'\"]+)['\"]?",
+            ]
+            for pattern in patterns:
+                match = re.search(pattern, message, re.IGNORECASE)
+                if match:
+                    return {"folder": match.group(1).strip()}
+            return {}  # List all
+
+        return {}
 
     def _get_handler(self, skill_id: str):
         """Get handler function for a skill."""
