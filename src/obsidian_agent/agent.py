@@ -410,9 +410,39 @@ class ObsidianAgent(AgentTemplate):
             else:
                 message = str(message)
 
-        # For read, create, update, append, delete - extract path
+        # For create - extract BOTH path and content
+        if skill_id == "obsidian_create":
+            result: dict[str, Any] = {}
+
+            # Pattern: "заметку X с содержанием/содержимым/текстом Y"
+            # Pattern: "note X with content Y"
+            content_patterns = [
+                r"(?:заметк[уа]|note|file)\s+([^\s]+)\s+(?:с\s+)?(?:содержани[ея]м?|содержимым|текстом|content|with)\s*[:\-]?\s*(.+)",
+                r"(?:заметк[уа]|note|file)\s+([^\s]+)\s+[:]\s*(.+)",
+            ]
+            for pattern in content_patterns:
+                match = re.search(pattern, message, re.IGNORECASE | re.DOTALL)
+                if match:
+                    path = match.group(1).strip().strip("'\".,!?;:")
+                    content = match.group(2).strip().strip("'\"")
+                    return {"path": path, "content": content}
+
+            # Fallback: extract path only (will fail validation but provides better error)
+            path_patterns = [
+                r"(?:заметк[уа]|note|file|файл)\s+['\"]?([^\s'\"]+)['\"]?",
+            ]
+            for pattern in path_patterns:
+                match = re.search(pattern, message, re.IGNORECASE)
+                if match:
+                    path = match.group(1).strip().strip(".,!?;:'\"")
+                    result["path"] = path
+                    break
+
+            return result
+
+        # For read, update, append, delete - extract path only
         if skill_id in [
-            "obsidian_read", "obsidian_create", "obsidian_update",
+            "obsidian_read", "obsidian_update",
             "obsidian_append", "obsidian_delete", "obsidian_tags",
             "obsidian_backlinks",
         ]:
