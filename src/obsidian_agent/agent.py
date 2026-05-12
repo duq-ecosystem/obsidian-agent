@@ -294,8 +294,29 @@ class ObsidianAgent(AgentTemplate):
                 error=str(e),
             )
 
-    def _extract_skill_from_message(self, message: str) -> str | None:
-        """Try to extract skill ID from natural language message."""
+    def _extract_skill_from_message(self, message: str | dict) -> str | None:
+        """Try to extract skill ID from natural language message.
+
+        Args:
+            message: String message or A2A dict format (defensive handling)
+
+        Returns:
+            Skill ID or None if not found
+        """
+        # Handle dict message format (defensive, in case server doesn't extract)
+        if isinstance(message, dict):
+            parts = message.get("parts", [])
+            if parts:
+                text_parts = [
+                    p.get("text", "") for p in parts
+                    if isinstance(p, dict) and p.get("kind") == "text"
+                ]
+                message = " ".join(text_parts)
+            elif "text" in message:
+                message = str(message["text"])
+            else:
+                message = str(message)
+
         message_lower = message.lower()
 
         skill_keywords = {
