@@ -252,12 +252,15 @@ class ObsidianAgent(AgentTemplate):
             Task result with status and data
         """
         logger.info(f"Processing task: {task.id}")
+        logger.info(f"Task message: {task.message[:200] if task.message else 'None'}...")
+        logger.info(f"Task context: {task.context}")
 
         try:
             # Extract skill and parameters from task
             skill_id = task.context.get("skill_id") or self._extract_skill_from_message(
                 task.message
             )
+            logger.info(f"Extracted skill_id: {skill_id}")
             params = task.context.get("parameters", {})
 
             # If no params provided, try to extract from message
