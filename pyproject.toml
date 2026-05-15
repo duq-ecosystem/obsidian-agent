@@ -9,8 +9,9 @@ authors = [
 ]
 
 dependencies = [
-    # Agent core library (from GitHub)
-    "duq-agent-core @ git+https://github.com/duq-ecosystem/duq-agent-core.git@master",
+    # duq-agent-core installed from local copy in Dockerfile
+    # For local dev: pip install -e ../duq-agent-core
+    "duq-agent-core",
 
     # FastAPI for A2A server
     "fastapi>=0.110.0",
