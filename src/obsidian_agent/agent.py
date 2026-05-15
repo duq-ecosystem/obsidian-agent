@@ -516,7 +516,18 @@ class ObsidianAgent(AgentTemplate):
 
     async def _handle_read(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle obsidian_read skill."""
-        path = params.get("path", "")
+        path = (
+            params.get("path")
+            or params.get("note_name")
+            or params.get("note_path")
+            or params.get("filename")
+            or params.get("name")
+            or ""
+        )
+        # Ensure .md extension
+        if path and not path.endswith(".md"):
+            path = f"{path}.md"
+
         if not path:
             return {"error": "Path not specified"}
 
@@ -527,11 +538,38 @@ class ObsidianAgent(AgentTemplate):
         return {"content": note.content, "path": note.path}
 
     async def _handle_create(self, params: dict[str, Any]) -> dict[str, Any]:
-        """Handle obsidian_create skill."""
-        path = params.get("path", "")
-        content = params.get("content", "")
+        """Handle obsidian_create skill.
+
+        Accepts multiple parameter name variations since LLM may use different names:
+        - path: path, note_title, note_path, filename, file_path, note_file, name
+        - content: content, note_content, text, body
+        """
+        # Support multiple parameter name variations from LLM
+        path = (
+            params.get("path")
+            or params.get("note_title")
+            or params.get("note_path")
+            or params.get("filename")
+            or params.get("file_path")
+            or params.get("note_file")
+            or params.get("name")
+            or ""
+        )
+        content = (
+            params.get("content")
+            or params.get("note_content")
+            or params.get("text")
+            or params.get("body")
+            or ""
+        )
         overwrite = params.get("overwrite", False)
         create_folders = params.get("create_folders", False)
+
+        # Ensure .md extension
+        if path and not path.endswith(".md"):
+            path = f"{path}.md"
+
+        logger.info(f"_handle_create: path={path}, content_len={len(content)}")
 
         if not path or not content:
             return {"error": "Need path and content"}
@@ -551,8 +589,23 @@ class ObsidianAgent(AgentTemplate):
 
     async def _handle_update(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle obsidian_update skill."""
-        path = params.get("path", "")
-        content = params.get("content", "")
+        path = (
+            params.get("path")
+            or params.get("note_path")
+            or params.get("note_name")
+            or params.get("filename")
+            or ""
+        )
+        content = (
+            params.get("content")
+            or params.get("note_content")
+            or params.get("text")
+            or params.get("body")
+            or ""
+        )
+        # Ensure .md extension
+        if path and not path.endswith(".md"):
+            path = f"{path}.md"
 
         if not path or not content:
             return {"error": "Need path and content"}
@@ -572,8 +625,23 @@ class ObsidianAgent(AgentTemplate):
 
     async def _handle_append(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle obsidian_append skill."""
-        path = params.get("path", "")
-        content = params.get("content", "")
+        path = (
+            params.get("path")
+            or params.get("note_path")
+            or params.get("note_name")
+            or params.get("filename")
+            or ""
+        )
+        content = (
+            params.get("content")
+            or params.get("note_content")
+            or params.get("text")
+            or params.get("body")
+            or ""
+        )
+        # Ensure .md extension
+        if path and not path.endswith(".md"):
+            path = f"{path}.md"
 
         if not path or not content:
             return {"error": "Need path and content"}
@@ -586,7 +654,18 @@ class ObsidianAgent(AgentTemplate):
 
     async def _handle_delete(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle obsidian_delete skill."""
-        path = params.get("path", "")
+        path = (
+            params.get("path")
+            or params.get("note_path")
+            or params.get("note_name")
+            or params.get("filename")
+            or params.get("file_path")
+            or ""
+        )
+        # Ensure .md extension
+        if path and not path.endswith(".md"):
+            path = f"{path}.md"
+
         if not path:
             return {"error": "Path not specified"}
 
