@@ -1,0 +1,50 @@
+Metadata-Version: 2.4
+Name: obsidian-agent
+Version: 0.1.0
+Summary: DUQ Obsidian specialist agent - manages Obsidian vault operations
+Author-email: Denis <noreply@example.com>
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: duq-agent-core @ git+https://github.com/duq-ecosystem/duq-agent-core.git@master
+Requires-Dist: fastapi>=0.110.0
+Requires-Dist: uvicorn[standard]>=0.27.0
+Requires-Dist: redis>=5.0.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: loguru>=0.7.0
+Requires-Dist: aiofiles>=23.2.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+
+# Obsidian Agent
+
+DUQ specialist agent for Obsidian vault operations.
+
+## Features
+
+- Full CRUD operations on Obsidian notes
+- Wikilink resolution
+- Tag management
+- Search across vault
+
+## Ports
+
+- 9001: A2A JSON-RPC endpoint
+
+## Tools
+
+- `obsidian_read` - Read note content
+- `obsidian_create` - Create new note
+- `obsidian_update` - Update existing note
+- `obsidian_delete` - Delete note
+- `obsidian_search` - Search vault
+- `obsidian_list_files` - List files in vault
+
+## Environment Variables
+
+- `OBSIDIAN_VAULT_PATH` - Path to Obsidian vault
+- `REDIS_URL` - Redis connection URL
+- `AGENT_NAME` - Agent identifier
+- `AGENT_PORT` - A2A server port

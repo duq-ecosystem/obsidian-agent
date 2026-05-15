@@ -53,7 +53,7 @@ class ObsidianAgent(AgentTemplate):
         super().__init__(card, config)
 
     def _create_skills(self) -> list[AgentSkill]:
-        """Create skill definitions for agent card."""
+        """Create skill definitions for agent card with full input schemas."""
         return [
             AgentSkill(
                 id="obsidian_read",
@@ -62,6 +62,16 @@ class ObsidianAgent(AgentTemplate):
                 tags=["read", "note"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path to note (e.g. 'Folder/note.md')",
+                        },
+                    },
+                    "required": ["path"],
+                },
             ),
             AgentSkill(
                 id="obsidian_create",
@@ -70,6 +80,28 @@ class ObsidianAgent(AgentTemplate):
                 tags=["write", "note", "create"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path for new note (e.g. 'Folder/note.md')",
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Note content in markdown",
+                        },
+                        "overwrite": {
+                            "type": "boolean",
+                            "description": "Overwrite if exists (default: false)",
+                        },
+                        "create_folders": {
+                            "type": "boolean",
+                            "description": "Create parent folders if missing (default: false)",
+                        },
+                    },
+                    "required": ["path", "content"],
+                },
             ),
             AgentSkill(
                 id="obsidian_update",
@@ -78,6 +110,20 @@ class ObsidianAgent(AgentTemplate):
                 tags=["write", "note", "update"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path to note (e.g. 'Folder/note.md')",
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "New content to replace existing",
+                        },
+                    },
+                    "required": ["path", "content"],
+                },
             ),
             AgentSkill(
                 id="obsidian_append",
@@ -86,6 +132,20 @@ class ObsidianAgent(AgentTemplate):
                 tags=["write", "note", "append"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path to note (e.g. 'Folder/note.md')",
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Content to append",
+                        },
+                    },
+                    "required": ["path", "content"],
+                },
             ),
             AgentSkill(
                 id="obsidian_delete",
@@ -94,6 +154,16 @@ class ObsidianAgent(AgentTemplate):
                 tags=["write", "note", "delete"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path to note to delete",
+                        },
+                    },
+                    "required": ["path"],
+                },
             ),
             AgentSkill(
                 id="obsidian_search",
@@ -102,6 +172,24 @@ class ObsidianAgent(AgentTemplate):
                 tags=["search", "grep"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "Text to search for",
+                        },
+                        "folder": {
+                            "type": "string",
+                            "description": "Limit search to folder (optional)",
+                        },
+                        "max_results": {
+                            "type": "integer",
+                            "description": "Max results to return (default: 20)",
+                        },
+                    },
+                    "required": ["query"],
+                },
             ),
             AgentSkill(
                 id="obsidian_move",
@@ -110,6 +198,20 @@ class ObsidianAgent(AgentTemplate):
                 tags=["write", "note", "move", "rename"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "old_path": {
+                            "type": "string",
+                            "description": "Current path of note",
+                        },
+                        "new_path": {
+                            "type": "string",
+                            "description": "New path for note",
+                        },
+                    },
+                    "required": ["old_path", "new_path"],
+                },
             ),
             AgentSkill(
                 id="obsidian_folders",
@@ -118,6 +220,11 @@ class ObsidianAgent(AgentTemplate):
                 tags=["list", "folders", "navigation"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {},
+                    "required": [],
+                },
             ),
             AgentSkill(
                 id="obsidian_list",
@@ -126,6 +233,16 @@ class ObsidianAgent(AgentTemplate):
                 tags=["list", "notes", "navigation"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "folder": {
+                            "type": "string",
+                            "description": "Folder to list (optional, defaults to root)",
+                        },
+                    },
+                    "required": [],
+                },
             ),
             AgentSkill(
                 id="obsidian_tags",
@@ -134,6 +251,16 @@ class ObsidianAgent(AgentTemplate):
                 tags=["tags", "metadata"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path to note",
+                        },
+                    },
+                    "required": ["path"],
+                },
             ),
             AgentSkill(
                 id="obsidian_search_tag",
@@ -142,6 +269,20 @@ class ObsidianAgent(AgentTemplate):
                 tags=["search", "tags"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "tag": {
+                            "type": "string",
+                            "description": "Tag to search for (without #)",
+                        },
+                        "folder": {
+                            "type": "string",
+                            "description": "Limit search to folder (optional)",
+                        },
+                    },
+                    "required": ["tag"],
+                },
             ),
             AgentSkill(
                 id="obsidian_backlinks",
@@ -150,6 +291,16 @@ class ObsidianAgent(AgentTemplate):
                 tags=["search", "links", "graph"],
                 input_modes=["text"],
                 output_modes=["text"],
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path to note",
+                        },
+                    },
+                    "required": ["path"],
+                },
             ),
         ]
 

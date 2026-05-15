@@ -1,0 +1,13 @@
+duq-agent-core @ git+https://github.com/duq-ecosystem/duq-agent-core.git@master
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+redis>=5.0.0
+pyyaml>=6.0
+loguru>=0.7.0
+aiofiles>=23.2.0
+
+[dev]
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+ruff>=0.1.0
